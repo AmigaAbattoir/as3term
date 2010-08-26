@@ -28,7 +28,7 @@
 				if (swfFile.exists)
 					swfFile.deleteFile();
 				
-				output = "";
+				output = "Compiling...";
 				
 				var fileStream:FileStream = new FileStream();
 				fileStream.open(scriptFile, FileMode.WRITE);
@@ -75,7 +75,7 @@
 			{
 				var mxmlc:NativeProcess = event.target as NativeProcess;
 				var string:String = mxmlc.standardOutput.readUTFBytes(event.bytesLoaded);
-				if (string.indexOf("Loading configuration") != 0)
+				if (string.indexOf("Loading configuration") != 0 && string != "")
 					output = string;
 			}
 			

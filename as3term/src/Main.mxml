@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" backgroundColor="#000000" backgroundAlpha="0.6" preloaderChromeColor="#000000"
+					   showStatusBar="false"
+					   creationComplete="windowedApplication_creationCompleteHandler(event)" xmlns:updater="http://updater.riaspace.com/" xmlns:views="com.riaspace.as3term.views.*">
+
+	<s:layout>
+		<s:VerticalLayout  horizontalAlign="right" paddingLeft="5" paddingRight="5" paddingTop="5" paddingBottom="5"/>
+	</s:layout>
+	
+	<fx:Style source="Styles.css"/>
+	
+	<fx:Script>
+		<![CDATA[
+			import air.update.events.StatusUpdateEvent;
+			import air.update.events.UpdateEvent;
+			
+			import com.riaspace.as3term.skins.CloseButtonSkin;
+			import com.riaspace.as3term.skins.NewButtonSkin;
+			import com.riaspace.as3term.skins.SettingsButtonSkin;
+			
+			import mx.events.FlexEvent;
+			
+			[Bindable]
+			public var flexHome:String;
+			
+			public var mxmlcRef:File;
+			
+			public var settings:SharedObject = SharedObject.getLocal("AS3TERM_SETTINGS");
+			
+			protected function windowedApplication_creationCompleteHandler(event:FlexEvent):void
+			{
+				flexHome = settings.data.flexHome;
+				
+				if (!flexHome)
+					currentState = "settings";
+				else
+				{
+					mxmlcRef = new File(flexHome).resolvePath("bin").resolvePath(mxmlc);
+					updater.initialize();
+				}
+			}
+
+			public function get mxmlc():String
+			{
+				if (Capabilities.os.indexOf("Win") > -1)
+					return "mxmlc.exe";
+				else
+					return "mxmlc";
+			}
+			
+			protected function updater_initializedHandler(event:UpdateEvent):void
+			{
+				updater.checkNow();
+			}
+
+			protected function updater_updateStatusHandler(event:StatusUpdateEvent):void
+			{
+				if (event.available)
+				{
+					currentState = "update";
+					event.preventDefault();
+				}
+			}
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<updater:NativeApplicationUpdater id="updater" 
+										  updateURL="https://as3term.googlecode.com/files/update.xml"
+										  initialized="updater_initializedHandler(event)"
+										  updateStatus="updater_updateStatusHandler(event)"
+										  />
+	</fx:Declarations>
+	
+	<s:states>
+		<s:State name="main" enterState="mainView.init()"/>
+		<s:State name="settings"/>
+		<s:State name="update" />
+	</s:states>
+
+	<s:HGroup width="100%" height="24" verticalAlign="middle" mouseDown="nativeWindow.startMove()">
+		<s:BitmapImage source="@Embed(source='/assets/logo.png')" />
+		<s:Label text="AS3Term" fontFamily="Verdana"  fontSize="16" fontWeight="bold" />
+		<mx:Spacer width="100%" />
+		<s:Button id="btnNew" toolTip="Clear" enabled.settings="false" click="mainView.btnNew_clickHandler(event)" skinClass="com.riaspace.as3term.skins.NewButtonSkin" />
+		<s:Button id="btnSettings" toolTip="Settings" enabled.settings="false" click="currentState='settings'" skinClass="com.riaspace.as3term.skins.SettingsButtonSkin" />
+		<s:Button id="btnClose" toolTip="Close" click="nativeApplication.exit()" skinClass="com.riaspace.as3term.skins.CloseButtonSkin" />
+	</s:HGroup>
+	
+	<views:EditorView id="mainView" width="100%" height="100%" includeIn="main"/>
+	
+	<views:SettingsView id="settingsView" width="100%" height="100%" includeIn="settings"/>
+	
+	<views:UpdateView id="updateView" updater="{updater}" width="100%" height="100%" includeIn="update" />
+		
+	<s:Label text="by Piotr Walczyszyn" click="navigateToURL(new URLRequest('http://riaspace.com'))" 
+			 textDecoration="underline" useHandCursor="true" buttonMode="true" />
+	
+</s:WindowedApplication>

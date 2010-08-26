@@ -6,7 +6,7 @@
 					   creationComplete="windowedApplication_creationCompleteHandler(event)" xmlns:updater="http://updater.riaspace.com/" xmlns:views="com.riaspace.as3term.views.*">
 
 	<s:layout>
-		<s:VerticalLayout  horizontalAlign="right" paddingLeft="5" paddingRight="5" paddingTop="5" paddingBottom="5"/>
+		<s:VerticalLayout horizontalAlign="right" paddingLeft="5" paddingRight="5" paddingTop="5" paddingBottom="5"/>
 	</s:layout>
 	
 	<fx:Style source="Styles.css"/>

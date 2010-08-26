@@ -1,0 +1,30 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+
+
+global
+{
+	chrome-color: #333333;
+	content-background-alpha: 0.72;
+	content-background-color: #000000;
+	color: #FFFFFF;
+	font-family: "Courier New";
+	selection-color: #808080;
+	focus-color: #6A6A6A;
+}
+	
+mx|ToolTip {
+	backgroundAlpha: 1.0;
+	backgroundColor: black;
+	color: white;
+	cornerRadius: 0;
+}
+
+mx|Alert
+{
+	backgroundAlpha: 0.3;
+	backgroundColor: black;
+	borderAlpha: 0.3;
+	borderColor: white;
+}

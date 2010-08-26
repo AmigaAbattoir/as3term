@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SkinnableContainer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					  xmlns:s="library://ns.adobe.com/flex/spark" 
+					  xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300"
+					  backgroundColor="#2F2E2E" backgroundAlpha="0.9">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.core.FlexGlobals;
+			protected function btnSelectSdkPath_clickHandler(event:MouseEvent):void
+			{
+				var binRef:File = File.desktopDirectory;
+				binRef.addEventListener(Event.SELECT, binRef_selectHandler);
+				binRef.browseForDirectory("Select bin folder of Flex SDK...");
+			}
+			
+			private function binRef_selectHandler(event:Event):void
+			{
+				var binRef:File = event.target as File;
+				FlexGlobals.topLevelApplication.mxmlcRef = new File(binRef.nativePath).resolvePath("bin").resolvePath(parentDocument.mxmlc);
+				
+				if(FlexGlobals.topLevelApplication.mxmlcRef.exists)
+				{
+					FlexGlobals.topLevelApplication.flexHome = binRef.nativePath;
+					txtSdkPath.errorString = "";					
+					btnSaveSettings.enabled = true;
+				}
+				else
+					txtSdkPath.errorString = "Selected path needs to point to your Flex SDK folder";
+			}
+			
+			protected function btnSaveSettings_clickHandler(event:MouseEvent):void
+			{
+				FlexGlobals.topLevelApplication.settings.data.flexHome = parentDocument.flexHome;
+				FlexGlobals.topLevelApplication.settings.flush();
+				
+				FlexGlobals.topLevelApplication.currentState = "main";
+			}
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<s:Label text="Setup" fontSize="16" fontWeight="bold" top="30" left="30" />
+	<s:HGroup horizontalCenter="0" verticalCenter="0" verticalAlign="middle">
+		<s:Label text="FLEX_HOME folder:" />
+		<s:TextInput id="txtSdkPath" text="{parentDocument.flexHome}" width="150"/>
+		<s:Button id="btnSelectSdkPath" label="Select" click="btnSelectSdkPath_clickHandler(event)" />
+	</s:HGroup>
+	<s:Button id="btnSaveSettings" label="OK" click="btnSaveSettings_clickHandler(event)"
+			  bottom="10" right="10" enabled="{parentDocument.flexHome != null}" />
+
+</s:SkinnableContainer>

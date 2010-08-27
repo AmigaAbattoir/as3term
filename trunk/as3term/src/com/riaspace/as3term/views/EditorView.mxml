@@ -5,120 +5,15 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import flashx.textLayout.operations.SplitParagraphOperation;
-			
-			import mx.core.FlexGlobals;
-			import mx.utils.StringUtil;
-			
-			import spark.events.TextOperationEvent;
+			import com.riaspace.as3term.pms.EditorPresentationModel;
 			
 			[Bindable]
-			protected var output:String;
+			[Inject]
+			public var model:EditorPresentationModel;
 			
-			protected var scriptFile:File = File.applicationStorageDirectory.resolvePath("Script.as");
-			
-			protected var swfFile:File = File.applicationStorageDirectory.resolvePath("script.swf");
-			
-			protected var scriptTemplate:String = "package {import flash.display.Sprite;public class Script extends Sprite{public function execute():String{{0}}}}";
-			
-			protected var shiftPressed:Boolean = false;
-
-			protected function executeScript():void
+			[Mediate("EditorEvent.CLEAR_EDITOR")]
+			public function focus():void
 			{
-				if (swfFile.exists)
-					swfFile.deleteFile();
-				
-				output = "Compiling...";
-				
-				var fileStream:FileStream = new FileStream();
-				fileStream.open(scriptFile, FileMode.WRITE);
-				fileStream.writeUTFBytes(StringUtil.substitute(scriptTemplate, txtScript.text));
-				fileStream.close();
-				
-				var info:NativeProcessStartupInfo = new NativeProcessStartupInfo();
-				info.executable = FlexGlobals.topLevelApplication.mxmlcRef;
-				
-				var args:Vector.<String> = new Vector.<String>();
-				args.push(
-					"-static-link-runtime-shared-libraries=true", 
-					scriptFile.nativePath, 
-					"-source-path", File.applicationStorageDirectory.nativePath, 
-					"-output=" + swfFile.nativePath);
-				info.arguments = args;
-				
-				var mxmlc:NativeProcess = new NativeProcess();
-				mxmlc.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA, onStandardOutputData);
-				mxmlc.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, onStandardErrorData); 
-				mxmlc.addEventListener(NativeProcessExitEvent.EXIT, onExit);
-				mxmlc.start(info);
-			}
-			
-			private function onStandardErrorData(event:ProgressEvent):void
-			{
-				var mxmlc:NativeProcess = event.target as NativeProcess;
-				output = mxmlc.standardError.readUTFBytes(event.bytesLoaded);
-			}
-			
-			private function onExit(event:NativeProcessExitEvent):void
-			{
-				if (swfFile.exists)
-				{
-					var request:URLRequest = new URLRequest(swfFile.url);
-					
-					var loader:Loader = new Loader();
-					loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onComplete);
-					loader.load(request);
-				}
-			}
-			
-			private function onStandardOutputData(event:ProgressEvent):void
-			{
-				var mxmlc:NativeProcess = event.target as NativeProcess;
-				var string:String = mxmlc.standardOutput.readUTFBytes(event.bytesLoaded);
-				if (string.indexOf("Loading configuration") != 0 && string != "")
-					output = string;
-			}
-			
-			private function onComplete(event:Event):void
-			{
-				var loaderInfo:LoaderInfo = event.target as LoaderInfo;
-				var LoadedClass:Class = loaderInfo.applicationDomain.getDefinition('Script') as Class;
-				var object:Object = new LoadedClass();
-				output = object.execute();
-			}
-			
-			private function txtScript_onKeyDown(event:KeyboardEvent):void
-			{
-				if (event.keyCode == Keyboard.SHIFT)
-					shiftPressed = true;
-			}
-			
-			protected function txtScript_keyUpHandler(event:KeyboardEvent):void
-			{
-				if (event.keyCode == Keyboard.SHIFT)
-					shiftPressed = false;
-			}
-			
-			protected function txtScript_changeHandler(event:TextOperationEvent):void
-			{
-				if (event.operation is SplitParagraphOperation && shiftPressed)
-				{
-					event.preventDefault();
-					event.stopImmediatePropagation();
-					
-					executeScript();
-				}
-			}
-			
-			public function btnNew_clickHandler(event:MouseEvent):void
-			{
-				txtScript.text = "\nreturn null;";
-				focusManager.setFocus(txtScript);
-			}
-			
-			public function init():void
-			{
-				txtScript.text = 'var result:String = "hello world!";\n// hit SHIFT + ENTER to execute\nreturn result;';
 				focusManager.setFocus(txtScript);
 			}
 			
@@ -129,8 +24,10 @@
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
 	
-	<s:TextArea id="txtScript" width="100%" height="75%" keyDown="txtScript_onKeyDown(event)" 
-				keyUp="txtScript_keyUpHandler(event)" changing="txtScript_changeHandler(event)" />
-	<s:TextArea id="txtOutput" width="100%" height="25%" text="{output}" editable="false" />
+	<s:TextArea id="txtScript" width="100%" height="75%" text="@{model.inputContent}"
+				changing="model.txtScript_changeHandler(event)"
+				keyDown="model.txtScript_onKeyDown(event)" keyUp="model.txtScript_keyUpHandler(event)" />
+	
+	<s:TextArea id="txtOutput" width="100%" height="25%" text="{model.outputContent}" editable="false" />
 
 </s:VGroup>

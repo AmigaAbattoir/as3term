@@ -6,56 +6,24 @@
 	
 	<fx:Script>
 		<![CDATA[
-			import air.update.events.DownloadErrorEvent;
-			import air.update.events.UpdateEvent;
+			import com.riaspace.as3term.pms.UpdatePresentationModel;
 			
-			import com.riaspace.nativeApplicationUpdater.NativeApplicationUpdater;
-			
-			import mx.controls.Alert;
-			
+			[Inject]
 			[Bindable]
-			public var updater:NativeApplicationUpdater;
-			
-			protected function btnYes_clickHandler(event:MouseEvent):void
-			{
-				prgBar.visible = true;
-				updater.addEventListener(DownloadErrorEvent.DOWNLOAD_ERROR, updater_downloadErrorHandler);
-				updater.addEventListener(UpdateEvent.DOWNLOAD_COMPLETE, updater_downloadCompleteHandler);
-				updater.downloadUpdate();
-			}
-
-			private function updater_downloadErrorHandler(event:DownloadErrorEvent):void
-			{
-				Alert.show("Error downloading update file, try again later.");
-				parentDocument.currentState = "main";
-			}
-
-			private function updater_downloadCompleteHandler(event:UpdateEvent):void
-			{
-				setTimeout(updater.installUpdate, 10);
-			}
-
-			protected function btnNo_clickHandler(event:MouseEvent):void
-			{
-				parentDocument.currentState = "main";
-			}
+			public var model:UpdatePresentationModel;
 
 		]]>
 	</fx:Script>
 	
-	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-	</fx:Declarations>
-	
 	<s:HGroup width="100%" verticalCenter="0" horizontalCenter="0" verticalAlign="top">
 		<s:BitmapImage source="@Embed(source='/assets/updateIcon.png')" />
 		<s:VGroup width="100%" horizontalAlign="center">
-			<s:Label text="New version ({updater.updateVersion}) of AS3Term is available." />
+			<s:Label text="New version ({model.updater.updateVersion}) of AS3Term is available." />
 			<s:Label text="Do you want to download it and install?" />
-			<mx:ProgressBar id="prgBar" source="{updater}" label="Downloading %3%" visible="false" />
+			<mx:ProgressBar id="prgBar" source="{model.updater}" label="Downloading %3%" visible="{model.downlaoding}" />
 			<s:HGroup>
-				<s:Button id="btnNo" label="No" click="btnNo_clickHandler(event)" />
-				<s:Button id="btnYes" label="Yes" click="btnYes_clickHandler(event)" />
+				<s:Button id="btnYes" label="Yes" click="model.btnYes_clickHandler(event)" />
+				<s:Button id="btnNo" label="No" click="model.btnNo_clickHandler(event)" />
 			</s:HGroup>
 		</s:VGroup>
 	</s:HGroup>

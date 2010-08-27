@@ -30,7 +30,10 @@ package com.riaspace.as3term.pms
 		public function init():void
 		{
 			selectedFlexHome = applicationModel.flexHome;
-			resolveMxmlc(new File(selectedFlexHome));
+			if (selectedFlexHome)
+				resolveMxmlc(new File(selectedFlexHome));
+			else
+				resolveMxmlc(File.desktopDirectory);
 		}
 		
 		protected function resolveMxmlc(flexHomeRef:File):void
@@ -39,7 +42,7 @@ package com.riaspace.as3term.pms
 			
 			if (flexHomeRef.exists)
 				mxmlc = flexHomeRef.resolvePath("bin").resolvePath(
-					(Capabilities.os.toLowerCase().indexOf("Win") > -1 ? "mxmlc.exe" : "mxmlc"));
+					(Capabilities.os.toLowerCase().indexOf("win") > -1 ? "mxmlc.exe" : "mxmlc"));
 			
 			if (mxmlc && mxmlc.exists)
 			{

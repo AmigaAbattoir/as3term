@@ -68,7 +68,7 @@ package com.riaspace.as3term.controllers
 			if (flexHome)
 				mxmlc = new File(flexHome)
 					.resolvePath("bin")
-					.resolvePath((Capabilities.os.toLowerCase().indexOf("Win") > -1 ? "mxmlc.exe" : "mxmlc"));
+					.resolvePath((Capabilities.os.toLowerCase().indexOf("win") > -1 ? "mxmlc.exe" : "mxmlc"));
 			
 			if (mxmlc && mxmlc.exists)
 			{

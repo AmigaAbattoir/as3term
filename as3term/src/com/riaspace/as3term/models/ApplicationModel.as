@@ -12,11 +12,13 @@ package com.riaspace.as3term.models
 		
 		public static const SETTINGS_STATE:String = "settings";
 		
-		public var currentState:String = EDITOR_STATE;
+		public var currentState:String;
 		
 		public var flexHome:String;
 		
 		public var mxmlc:File;
+		
+		public var scriptTemplate:String;
 		
 	}
 }

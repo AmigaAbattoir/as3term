@@ -30,11 +30,13 @@ package com.riaspace.as3term.pms
 		[Inject(source="applicationModel.mxmlc", bind="true")]
 		public var mxmlc:File;
 		
+		[Inject(source="applicationModel.scriptTemplate")]
+		public var scriptTemplate:String;
+		
 		protected var scriptFile:File = File.applicationStorageDirectory.resolvePath("Script.as");
 		
 		protected var swfFile:File = File.applicationStorageDirectory.resolvePath("script.swf");
 		
-		protected var scriptTemplate:String = "package {import flash.display.Sprite;public class Script extends Sprite{public function execute():String{{0}}}}";
 		
 		protected var shiftPressed:Boolean = false;
 		
@@ -42,7 +44,7 @@ package com.riaspace.as3term.pms
 		{
 			if (swfFile.exists)
 				swfFile.deleteFile();
-			
+
 			outputContent = "Compiling...";
 			
 			var fileStream:FileStream = new FileStream();
@@ -56,27 +58,17 @@ package com.riaspace.as3term.pms
 			var args:Vector.<String> = new Vector.<String>();
 			args.push(
 				"-static-link-runtime-shared-libraries=true",
-				"-debug=true",
 				scriptFile.nativePath, 
 				"-source-path", File.applicationStorageDirectory.nativePath, 
 				"-output=" + swfFile.nativePath);
 			info.arguments = args;
 			
 			var mxmlcProcess:NativeProcess = new NativeProcess();
-			mxmlcProcess.addEventListener(ProgressEvent.STANDARD_OUTPUT_DATA, onStandardOutputData);
 			mxmlcProcess.addEventListener(ProgressEvent.STANDARD_ERROR_DATA, onStandardErrorData); 
 			mxmlcProcess.addEventListener(NativeProcessExitEvent.EXIT, onExit);
 			mxmlcProcess.start(info);
 		}
 		
-		protected function onStandardOutputData(event:ProgressEvent):void
-		{
-			var mxmlcProcess:NativeProcess = event.target as NativeProcess;
-			var string:String = mxmlcProcess.standardOutput.readUTFBytes(event.bytesLoaded);
-			if (string.indexOf("Loading configuration") != 0 && string != "")
-				outputContent = string;
-		}
-
 		protected function onStandardErrorData(event:ProgressEvent):void
 		{
 			var mxmlcProcess:NativeProcess = event.target as NativeProcess;
@@ -97,10 +89,28 @@ package com.riaspace.as3term.pms
 
 		protected function onComplete(event:Event):void
 		{
+			outputContent = "";
+			
 			var loaderInfo:LoaderInfo = event.target as LoaderInfo;
-			var LoadedClass:Class = loaderInfo.applicationDomain.getDefinition("Script") as Class;
-			var object:Object = new LoadedClass();
-			outputContent = object.execute();
+			var Script:Class = loaderInfo.applicationDomain.getDefinition("Script") as Class;
+			var script:Object = new Script();
+			script.traceFunction = appendTrace;
+			appendTrace(script.execute());
+		}
+		
+		protected function appendTrace(...parameters):void
+		{
+			if (parameters.length > 0)
+			{
+				var str:String = "";
+				if (parameters[0] is Array)
+					for each (var param:* in parameters[0])
+						str += param + " ";
+				else
+					str = parameters[0];
+
+				outputContent += str + "\n";
+			}
 		}
 		
 		public function txtScript_onKeyDown(event:KeyboardEvent):void

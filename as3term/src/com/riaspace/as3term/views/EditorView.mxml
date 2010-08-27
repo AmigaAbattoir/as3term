@@ -12,7 +12,7 @@
 			public var model:EditorPresentationModel;
 			
 			[Mediate("EditorEvent.CLEAR_EDITOR")]
-			public function focus():void
+			public function focusEditor():void
 			{
 				focusManager.setFocus(txtScript);
 			}

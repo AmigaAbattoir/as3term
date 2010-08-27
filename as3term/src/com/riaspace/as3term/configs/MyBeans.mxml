@@ -17,7 +17,7 @@
 		<models:ApplicationModel id="applicationModel" />
 
 		<controllers:StartupController id="startupController" />
-		<updater:NativeApplicationUpdater id="updater" updateURL="https://as3term.googlecode.com/files/update.xml" />
+		<updater:NativeApplicationUpdater id="updater" updateURL="https://alterapps.nazwa.pl/as3term/update.xml" />
 
 		<swiz:Prototype id="mainPresentationModel" type="{MainPresentationModel}" singleton="true" />
 		<swiz:Prototype id="editorPresentationModel" type="{EditorPresentationModel}" singleton="true" />

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:VGroup xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 xmlns:views="com.riaspace.as3term.views.*"
+		 width="400" height="300" horizontalAlign="right"
+		 currentState="{model.currentState}">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.riaspace.as3term.pms.MainPresentationModel;
+			
+			[Inject]
+			[Bindable]
+			public var model:MainPresentationModel;
+			
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="editor" enterState="editorView.focus()" />
+		<s:State name="updates" />
+		<s:State name="settings" />
+	</s:states>
+	
+	<s:HGroup id="topBar" width="100%" height="24" verticalAlign="middle" mouseDown="NativeApplication.nativeApplication.activeWindow.startMove()">
+		<s:BitmapImage source="@Embed(source='/assets/logo.png')" />
+		<s:Label text="AS3Term" fontFamily="Verdana"  fontSize="16" fontWeight="bold" />
+		<mx:Spacer width="100%" />
+		<s:Button id="btnNew" toolTip="Clear" enabled.settings="false" click="model.btnNew_clickHandler(event)" skinClass="com.riaspace.as3term.skins.NewButtonSkin" />
+		<s:Button id="btnSettings" toolTip="Settings" enabled.settings="false" click="model.btnSettings_clickHandler(event)" skinClass="com.riaspace.as3term.skins.SettingsButtonSkin" />
+		<s:Button id="btnClose" toolTip="Close" click="NativeApplication.nativeApplication.exit()" skinClass="com.riaspace.as3term.skins.CloseButtonSkin" />
+	</s:HGroup>
+	
+	<views:EditorView id="editorView" width="100%" height="100%" includeIn="editor"/>
+	
+	<views:SettingsView id="settingsView" width="100%" height="100%" includeIn="settings"/>
+	
+	<views:UpdateView id="updateView" width="100%" height="100%" includeIn="updates" />
+	
+	<s:Label text="by Piotr Walczyszyn" click="navigateToURL(new URLRequest('http://riaspace.com'))" 
+			 textDecoration="underline" useHandCursor="true" buttonMode="true" />
+	
+</s:VGroup>

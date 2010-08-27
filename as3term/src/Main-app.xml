@@ -18,18 +18,18 @@
 	<id>com.riaspace.as3term</id>
 
 	<!-- Used as the filename for the application. Required. -->
-	<filename>AS3Term</filename>
+	<filename>as3term</filename>
 
 	<!-- The name that is displayed in the AIR application installer. 
 	     May have multiple values for each language. See samples or xsd schema file. Optional. -->
-	<name>AS3Term</name>
+	<name>as3term</name>
 
 	<!-- An application version designator (such as "v1", "2.5", or "Alpha 1"). Required. -->
 	<version>1.0.2</version>
 
 	<!-- Description, displayed in the AIR application installer.
 	     May have multiple values for each language. See samples or xsd schema file. Optional. -->
-	<description>AS3Term</description>
+	<description>as3term application</description>
 
 	<!-- Copyright information. Optional -->
 	<copyright>Piotr Walczyszyn (www.riaspace.com)</copyright>
@@ -44,7 +44,7 @@
 		<content>[This value will be overwritten by Flash Builder in the output app.xml]</content>
 		
 		<!-- The title of the main window. Optional. -->
-		<title>AS3Term</title>
+		<title>as3term</title>
 
 		<!-- The type of system chrome to use (either "standard" or "none"). Optional. Default standard. -->
 		<systemChrome>none</systemChrome>

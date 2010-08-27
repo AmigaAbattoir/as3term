@@ -7,6 +7,8 @@ package com.riaspace.as3term.controllers
 	import com.riaspace.nativeApplicationUpdater.NativeApplicationUpdater;
 	
 	import flash.filesystem.File;
+	import flash.filesystem.FileMode;
+	import flash.filesystem.FileStream;
 	import flash.system.Capabilities;
 	
 	import org.swizframework.storage.SharedObjectBean;
@@ -25,6 +27,8 @@ package com.riaspace.as3term.controllers
 		[PostConstruct]
 		public function init():void
 		{
+			initTemplate();
+			
 			initSettings();
 			
 			if (applicationModel.currentState == ApplicationModel.EDITOR_STATE)
@@ -35,12 +39,19 @@ package com.riaspace.as3term.controllers
 			}
 		}
 
-		private function updater_initializedHandler(event:UpdateEvent):void
+		protected function initTemplate():void 
+		{
+			var fileStream:FileStream = new FileStream();
+			fileStream.open(File.applicationDirectory.resolvePath("assets/ScriptTemplate.txt"), FileMode.READ);
+			applicationModel.scriptTemplate = fileStream.readUTFBytes(fileStream.bytesAvailable);
+		}
+		
+		protected function updater_initializedHandler(event:UpdateEvent):void
 		{
 			updater.checkNow();
 		}
 
-		private function updater_statusUpdateHandler(event:StatusUpdateEvent):void
+		protected function updater_statusUpdateHandler(event:StatusUpdateEvent):void
 		{
 			if (event.available)
 			{

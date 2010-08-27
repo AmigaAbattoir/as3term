@@ -18,7 +18,7 @@
 	</fx:Script>
 	
 	<s:states>
-		<s:State name="editor" enterState="editorView.focus()" />
+		<s:State name="editor" enterState="editorView.focusEditor()" />
 		<s:State name="updates" />
 		<s:State name="settings" />
 	</s:states>

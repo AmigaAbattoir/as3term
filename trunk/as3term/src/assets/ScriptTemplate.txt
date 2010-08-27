@@ -1,0 +1,25 @@
+package {
+	
+	import flash.display.Sprite;
+	import flash.utils.IDataOutput;
+	
+	public class Script extends Sprite
+	{
+	
+		public var traceFunction:Function;
+	
+		public function Script()
+		{
+		}
+	
+		public function execute():*
+		{
+			{0} // script
+		}
+		
+		private function trace(...parameters):void
+		{
+			traceFunction.call(this, parameters);
+		}
+	}
+}

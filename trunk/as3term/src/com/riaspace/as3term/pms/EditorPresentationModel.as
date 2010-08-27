@@ -58,6 +58,7 @@ package com.riaspace.as3term.pms
 			var args:Vector.<String> = new Vector.<String>();
 			args.push(
 				"-static-link-runtime-shared-libraries=true",
+				"-debug=true",
 				scriptFile.nativePath, 
 				"-source-path", File.applicationStorageDirectory.nativePath, 
 				"-output=" + swfFile.nativePath);

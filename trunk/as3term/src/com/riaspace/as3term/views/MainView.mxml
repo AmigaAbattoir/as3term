@@ -25,7 +25,7 @@
 	
 	<s:HGroup id="topBar" width="100%" height="24" verticalAlign="middle" mouseDown="NativeApplication.nativeApplication.activeWindow.startMove()">
 		<s:BitmapImage source="@Embed(source='/assets/logo.png')" />
-		<s:Label text="AS3Term" fontFamily="Verdana"  fontSize="16" fontWeight="bold" />
+		<s:Label text="as3term" fontFamily="Verdana"  fontSize="16" fontWeight="bold" />
 		<mx:Spacer width="100%" />
 		<s:Button id="btnNew" toolTip="Clear" enabled.settings="false" click="model.btnNew_clickHandler(event)" skinClass="com.riaspace.as3term.skins.NewButtonSkin" />
 		<s:Button id="btnSettings" toolTip="Settings" enabled.settings="false" click="model.btnSettings_clickHandler(event)" skinClass="com.riaspace.as3term.skins.SettingsButtonSkin" />

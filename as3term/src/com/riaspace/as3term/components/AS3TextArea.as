@@ -1,20 +1,25 @@
 package com.riaspace.as3term.components
 {
+	import flash.events.Event;
+	import flash.events.TimerEvent;
 	import flash.text.StyleSheet;
+	import flash.utils.Timer;
 	
+	import flashx.textLayout.conversion.ITextImporter;
+	import flashx.textLayout.conversion.TextConverter;
+	import flashx.textLayout.elements.Configuration;
+	import flashx.textLayout.formats.LineBreak;
+	import flashx.textLayout.formats.TextLayoutFormat;
 	import flashx.textLayout.formats.WhiteSpaceCollapse;
 	
-	import mx.events.FlexEvent;
-	
 	import spark.components.TextArea;
+	import spark.components.TextSelectionHighlighting;
 	import spark.events.TextOperationEvent;
-	import spark.utils.TextFlowUtil;
 	
 	[Bindable]
 	public class AS3TextArea extends TextArea
 	{
-		
-		public var syntaxStyles:StyleSheet = new StyleSheet();
+		private static const TEXT_LAYOUT_NAMESPACE:String = "http://ns.adobe.com/textLayout/2008";
 		
 		public var accessModifiers:Array = ["public", "private", "protected", "internal"];
 		
@@ -39,36 +44,66 @@ package com.riaspace.as3term.components
 		public var strings:Array = ['".*?"', "'.*?'"];
 		
 		public var comments:Array = ["//.*$", "/\\\*[.\\w\\s]*\\\*/", "/\\\*([^*]|[\\r\\n]|(\\\*+([^*/]|[\\r\\n])))*\\\*/"];
-
-		public var syntaxStyleSheet:String = ".text{color:#dfe0e2;}.default{color:#5d7dfc;} .var{color:#6f9fcf;} .function{color:#45a173;} .strings{color:#a82929;} .comment{color:#0e9e0f;font-style:italic;} .asDocComment{color:#5c77c8;}";
+		
+		public var defaultStyleSheet:String = ".text{color:#000000;font-family: courier;} .default{color:#0839ff;} .var{color:#80aad4;} .function{color:#55a97f;}.strings{color:#a82929;} .comment{color:#0e9e0f;font-style:italic;} .asDocComment{color:#5d78c9;}";
+		
+		protected var _syntaxStyleSheet:String;
 		
 		protected var syntax:RegExp;
 		
 		protected var styleSheet:StyleSheet = new StyleSheet();
 		
+		protected var importer:ITextImporter;
+		
+		protected var pseudoThread:Timer = new Timer(300, 1);
+		
 		public function AS3TextArea()
 		{
 			super();
 			
-			initSyntaxRegExp();
-
-			styleSheet.parseCSS(syntaxStyleSheet);
+			initTextFlowImporter();
 			
-			addEventListener(FlexEvent.CREATION_COMPLETE, onCreationComplete);
-			addEventListener(TextOperationEvent.CHANGE, onChange);
+			initSyntaxRegExp();
+			styleSheet.parseCSS(defaultStyleSheet);
+			
+			selectable = true;
+			selectionHighlighting = TextSelectionHighlighting.ALWAYS;
+			setStyle("lineBreak", LineBreak.EXPLICIT);
+			
+			addEventListener("textChanged", 
+				function(event:Event):void 
+				{
+					colorize();
+				});
+			
+			addEventListener(TextOperationEvent.CHANGE, 
+				function(event:TextOperationEvent):void
+				{
+					if (!pseudoThread.running)
+						pseudoThread.start();
+				});
+			
+			pseudoThread.addEventListener(TimerEvent.TIMER, 
+				function(event:TimerEvent):void
+				{
+					colorize();
+					pseudoThread.reset();
+				});
 		}
-
-		protected function onChange(event:TextOperationEvent):void
+		
+		protected function initTextFlowImporter():void 
 		{
-			colorize();
+			var config:Configuration = new Configuration();
+			config.manageTabKey = true;
+			
+			var format:TextLayoutFormat = new TextLayoutFormat(config.textFlowInitialFormat);
+			format.whiteSpaceCollapse = WhiteSpaceCollapse.PRESERVE;
+			config.textFlowInitialFormat = format;
+			
+			importer = TextConverter.getImporter(TextConverter.TEXT_LAYOUT_FORMAT, config);
+			importer.throwOnError = true;
 		}
-
-		protected function onCreationComplete(event:FlexEvent):void
-		{
-			removeEventListener(FlexEvent.CREATION_COMPLETE, onCreationComplete);
-			colorize();
-		}
-		 
+		
 		protected function initSyntaxRegExp():void 
 		{
 			var pattern:String = "";
@@ -111,14 +146,15 @@ package com.riaspace.as3term.components
 			this.syntax = new RegExp(pattern, "gm");
 		}
 		
-		protected function colorize():void
+		protected function colorize(event:Event = null):void
 		{
-			var pos:int = this.selectionActivePosition;
+			var actPos:int = this.selectionActivePosition;
+			var ancPos:int = this.selectionAnchorPosition;
 			
 			var script:String = this.text
+				.replace(/&/g, "&amp;")
 				.replace(/</g, "&lt;")
-				.replace(/>/g, "&gt;")
-				.replace(/&/g, "&amp;");
+				.replace(/>/g, "&gt;");
 			
 			var token:* = syntax.exec(script);
 			while(token)
@@ -145,16 +181,19 @@ package com.riaspace.as3term.components
 				token = syntax.exec(script);
 			}
 			
-			var p:String = "<p " + getStyleAttributes(styleSheet.getStyle(".text")) + ">" + script + "</p>";
-			trace(p);
-			this.textFlow = TextFlowUtil.importFromString(p, WhiteSpaceCollapse.PRESERVE);
-			this.selectRange(pos, pos);
+			var p:String = "<TextFlow xmlns=\"" + TEXT_LAYOUT_NAMESPACE + "\"><p " 
+				+ getStyleAttributes(styleSheet.getStyle(".text")) + ">" + script + "</p></TextFlow>";
+			
+			this.textFlow = importer.importToFlow(p);
+			
+			this.scrollToRange(ancPos, actPos);
+			this.selectRange(ancPos, actPos);
 		}
 		
 		protected function getStyleAttributes(style:Object):String
 		{
 			return (style.color ? " color='" + style.color + "'" : "")
-				+ (style.fontFamily ? " fontFamily='" + style.fontFamily + "'" : "")
+			+ (style.fontFamily ? " fontFamily='" + style.fontFamily + "'" : "")
 				+ (style.fontSize ? " fontSize='" + style.fontSize + "'" : "")
 				+ (style.fontStyle ? " fontStyle='" + style.fontStyle + "'" : "")
 				+ (style.fontWeight ? " fontWeight='" + style.fontWeight + "'" : ""); 
@@ -224,6 +263,24 @@ package com.riaspace.as3term.components
 				return "primitives";
 			}
 			return result;
+		}
+		
+		public function get syntaxStyleSheet():String
+		{
+			return _syntaxStyleSheet;
+		}
+		
+		public function set syntaxStyleSheet(value:String):void
+		{
+			_syntaxStyleSheet = value;
+			
+			styleSheet.clear();
+			if (_syntaxStyleSheet)
+				styleSheet.parseCSS(_syntaxStyleSheet);
+			else
+				styleSheet.parseCSS(defaultStyleSheet);
+			
+			colorize();
 		}
 	}
 }

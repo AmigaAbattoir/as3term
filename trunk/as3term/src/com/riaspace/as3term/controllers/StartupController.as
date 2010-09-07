@@ -24,6 +24,8 @@ package com.riaspace.as3term.controllers
 		[Inject]
 		public var updater:NativeApplicationUpdater;
 		
+		protected var os:String = Capabilities.os.toLowerCase();
+		
 		[PostConstruct]
 		public function init():void
 		{
@@ -62,16 +64,40 @@ package com.riaspace.as3term.controllers
 		
 		protected function initSettings():void 
 		{
+			var java:File;
+			var javaPath:String = settings.getString("JAVA_PATH");
+			
+			if (javaPath)
+				java = new File(javaPath);
+			
+			if (!java || !java.exists)
+			{
+				if (os.indexOf('win') > -1)
+				{
+					java = new File("c:/windows/system32/javaw.exe");
+				}
+				else
+				{
+					java = new File("/usr/bin/java");
+					if (!java.exists)
+						java = new File(os.indexOf("mac") > -1 ? 
+							"/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands/java" 
+							: 
+							"/etc/alternatives/java");
+				}
+			}
+			
 			var mxmlc:File;
 			var flexHome:String = settings.getString("FLEX_HOME");
 			
 			if (flexHome)
 				mxmlc = new File(flexHome)
 					.resolvePath("bin")
-					.resolvePath((Capabilities.os.toLowerCase().indexOf("win") > -1 ? "mxmlc.exe" : "mxmlc"));
+					.resolvePath((os.indexOf("win") > -1 ? "mxmlc.exe" : "mxmlc"));
 			
-			if (mxmlc && mxmlc.exists)
+			if (mxmlc && mxmlc.exists && java.exists)
 			{
+				applicationModel.java = java;
 				applicationModel.flexHome = flexHome;
 				applicationModel.mxmlc = mxmlc;
 				applicationModel.currentState = ApplicationModel.EDITOR_STATE;

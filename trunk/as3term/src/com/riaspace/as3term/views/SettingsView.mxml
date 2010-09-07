@@ -28,6 +28,12 @@
 	<s:Label text="Setup" fontSize="16" fontWeight="bold" top="30" left="30" />
 	
 	<mx:Form horizontalCenter="0" verticalCenter="0">
+		<mx:FormItem label="Java executable:" direction="horizontal">
+			<s:TextInput id="txtJavaPath" text="{model.selectedJavaPath}" editable="false" width="180" 
+						 errorString.valid="{''}" errorString.notvalid="Select path that points to java executable."/>
+			<s:Button id="btnSelectJavaPath" label="Select" click="model.btnSelectJavaPath_clickHandler(event)" />
+		</mx:FormItem>
+
 		<mx:FormItem label="FLEX_HOME folder:" direction="horizontal">
 			<s:TextInput id="txtSdkPath" text="{model.selectedFlexHome}" editable="false" width="180" 
 						 errorString.valid="{''}" errorString.notvalid="Select path that points to Flex SDK home folder."/>

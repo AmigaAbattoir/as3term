@@ -26,11 +26,43 @@
 	</fx:Script>
 	
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
-		
+		<fx:String id="syntaxStyleSheet">
+			<![CDATA[
+			.text
+			{
+			color:#dfe0e2;
+			font-family: courier;
+			}
+			.default
+			{
+			color:#5d7dfc;
+			}
+			.var
+			{
+			color:#6f9fcf;
+			} 
+			.function
+			{
+			color:#45a173;
+			} 
+			.strings
+			{
+			color:#a82929;
+			} 
+			.comment
+			{
+			color:#0e9e0f;
+			font-style:italic;
+			} 
+			.asDocComment
+			{
+			color:#5c77c8;
+			}
+			]]>
+		</fx:String>		
 	</fx:Declarations>
 	
-	<components:AS3TextArea id="txtScript" width="100%" height="75%" text="@{model.inputContent}"
+	<components:AS3TextArea id="txtScript" syntaxStyleSheet="{syntaxStyleSheet}" width="100%" height="75%" text="@{model.inputContent}"
 				changing="model.txtScript_changeHandler(event)" 
 				keyDown="model.txtScript_onKeyDown(event)" keyUp="model.txtScript_keyUpHandler(event)" />
 	

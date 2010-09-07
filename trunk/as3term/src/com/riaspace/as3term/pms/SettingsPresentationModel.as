@@ -15,6 +15,9 @@ package com.riaspace.as3term.pms
 		[Bindable]
 		public var selectedFlexHome:String;
 		
+		[Bindable]
+		public var selectedJavaPath:String;
+		
 		private var selectedMxmlc:File;
 		
 		[Bindable]
@@ -29,11 +32,25 @@ package com.riaspace.as3term.pms
 		[PostConstruct]
 		public function init():void
 		{
+			selectedJavaPath = applicationModel.java.nativePath;
+			if (selectedJavaPath)
+				resolveJava(new File(selectedJavaPath));
+			else
+				resolveJava(File.desktopDirectory);
+			
 			selectedFlexHome = applicationModel.flexHome;
 			if (selectedFlexHome)
 				resolveMxmlc(new File(selectedFlexHome));
 			else
 				resolveMxmlc(File.desktopDirectory);
+		}
+
+		protected function resolveJava(javaPathRef:File):void
+		{
+			if (javaPathRef.exists)
+			{
+				selectedJavaPath = javaPathRef.nativePath;
+			}
 		}
 		
 		protected function resolveMxmlc(flexHomeRef:File):void
@@ -56,16 +73,18 @@ package com.riaspace.as3term.pms
 			}
 		}
 		
+		public function btnSelectJavaPath_clickHandler(event:MouseEvent):void
+		{
+			var javaPathRef:File = new File(selectedJavaPath);
+			javaPathRef.addEventListener(Event.SELECT, function(event:Event):void {resolveJava(event.target as File);});
+			javaPathRef.browseForOpen("Select java executable...");			
+		}
+		
 		public function btnSelectFlexHome_clickHandler(event:MouseEvent):void
 		{
 			var flexHomeRef:File = new File(selectedFlexHome);
-			flexHomeRef.addEventListener(Event.SELECT, flexHomeRef_selectHandler);
+			flexHomeRef.addEventListener(Event.SELECT, function(event:Event):void {resolveMxmlc(event.target as File);});
 			flexHomeRef.browseForDirectory("Select bin folder of Flex SDK...");
-		}
-		
-		public function flexHomeRef_selectHandler(event:Event):void
-		{
-			resolveMxmlc(event.target as File);
 		}
 		
 		public function btnSaveSettings_clickHandler(event:MouseEvent):void

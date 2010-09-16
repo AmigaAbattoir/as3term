@@ -27,6 +27,7 @@
 			.text
 			{
 				color:#dfe0e2;
+				font-style: normal;
 				font-family: Courier New;
 			}
 			.default
@@ -53,11 +54,14 @@
 			.asDocComment
 			{
 				color:#5c77c8;
+				font-style:italic;
 			}
+			
 			.traceFunction
 			{
 				color:#dc6066;
 			}
+			
 			]]>
 		</fx:String>		
 	</fx:Declarations>

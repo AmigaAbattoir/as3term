@@ -2,10 +2,25 @@
 <s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
 					   xmlns:s="library://ns.adobe.com/flex/spark" 
 					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   skinClass="com.riaspace.as3term.skins.AppWindowSkin"
 					   backgroundColor="#000000" backgroundAlpha="0.6" preloaderChromeColor="#000000"
-					   showStatusBar="false" xmlns:swiz="http://swiz.swizframework.org" xmlns:configs="com.riaspace.as3term.configs.*" xmlns:views="com.riaspace.as3term.views.*">
+					   showStatusBar="false" xmlns:swiz="http://swiz.swizframework.org" xmlns:configs="com.riaspace.as3term.configs.*" xmlns:views="com.riaspace.as3term.views.*"
+					   applicationComplete="windowedapplication_applicationCompleteHandler(event)">
 	
 	<fx:Style source="Styles.css"/>
+	<fx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+
+			protected function windowedapplication_applicationCompleteHandler(event:FlexEvent):void
+			{
+				// Center main AIR app window on the screen
+				nativeWindow.x = (Capabilities.screenResolutionX - nativeWindow.width) / 2;
+				nativeWindow.y = (Capabilities.screenResolutionY - nativeWindow.height) / 2;
+			}
+
+		]]>
+	</fx:Script>
 	
 	<fx:Declarations>
 		<swiz:Swiz>

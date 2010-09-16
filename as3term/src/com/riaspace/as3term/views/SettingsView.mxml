@@ -32,12 +32,12 @@
 	
 	<mx:Form id="frm" horizontalCenter="0" verticalCenter="0">
 		<mx:FormItem label="Java executable:" direction="horizontal">
-			<s:TextInput id="txtJavaPath" text="{model.selectedJavaPath}" editable="false" width="180" />
+			<s:TextInput id="txtJavaPath" text="{model.selectedJavaPath}" toolTip="{txtJavaPath.text}" editable="false" width="180" />
 			<s:Button id="btnSelectJavaPath" label="Select" click="model.btnSelectJavaPath_clickHandler(event)" />
 		</mx:FormItem>
 
 		<mx:FormItem label="Flex SDK folder:" direction="horizontal">
-			<s:TextInput id="txtSdkPath" text="{model.selectedFlexSdkDirPath}" editable="false" width="180" />
+			<s:TextInput id="txtSdkPath" text="{model.selectedFlexSdkDirPath}" toolTip="{txtSdkPath.text}" editable="false" width="180" />
 			<s:Button id="btnSelectFlexHome" label="Select" click="model.btnSelectFlexHome_clickHandler(event)" />
 		</mx:FormItem>
 	</mx:Form>

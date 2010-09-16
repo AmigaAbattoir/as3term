@@ -67,7 +67,7 @@ package com.riaspace.as3term.pms
 				
 				settings.setString("JAVA_EXECUTABLE_PATH", 
 					applicationModel.javaExecutable.nativePath);
-				settings.setString("FLEX_SDK_DIR_PATH",
+				settings.setString("FLEX_HOME",
 					applicationModel.flexSdkDir.nativePath);
 				
 				applicationModel.currentState = ApplicationModel.EDITOR_STATE;

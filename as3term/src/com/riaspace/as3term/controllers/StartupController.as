@@ -11,7 +11,11 @@ package com.riaspace.as3term.controllers
 	import flash.filesystem.FileStream;
 	import flash.system.Capabilities;
 	
+	import mx.core.FlexGlobals;
+	
 	import org.swizframework.storage.SharedObjectBean;
+	
+	import spark.components.Application;
 
 	public class StartupController
 	{
@@ -29,18 +33,21 @@ package com.riaspace.as3term.controllers
 		[PostConstruct]
 		public function init():void
 		{
-//			settings.clear();
-			
 			initTemplate();
 			
 			initSettings();
 			
 			if (applicationModel.currentState == ApplicationModel.EDITOR_STATE)
 			{
-				updater.addEventListener(UpdateEvent.INITIALIZED, updater_initializedHandler);
-				updater.addEventListener(StatusUpdateEvent.UPDATE_STATUS, updater_statusUpdateHandler);
+				updater.addEventListener(UpdateEvent.INITIALIZED, 
+					updater_initializedHandler);
+				updater.addEventListener(StatusUpdateEvent.UPDATE_STATUS, 
+					updater_statusUpdateHandler);
 				updater.initialize();
 			}
+			
+			var application:Application = 
+				FlexGlobals.topLevelApplication as Application;
 		}
 
 		protected function initTemplate():void 
@@ -91,7 +98,7 @@ package com.riaspace.as3term.controllers
 			}
 			
 			var flexSdkDir:File;
-			var flexSdkDirPath:String = settings.getString("FLEX_SDK_DIR_PATH");
+			var flexSdkDirPath:String = settings.getString("FLEX_HOME");
 			
 			if (flexSdkDirPath)
 				flexSdkDir = new File(flexSdkDirPath);
@@ -104,5 +111,6 @@ package com.riaspace.as3term.controllers
 			else
 				applicationModel.currentState = ApplicationModel.SETTINGS_STATE;
 		}
+		
 	}
 }

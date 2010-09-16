@@ -3,7 +3,7 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx" 
 		 xmlns:views="com.riaspace.as3term.views.*"
-		 width="400" height="300" horizontalAlign="right"
+		 width="400" height="300" horizontalAlign="left"
 		 currentState="{model.currentState}">
 	
 	<fx:Script>

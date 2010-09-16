@@ -27,7 +27,7 @@
 			.text
 			{
 				color:#dfe0e2;
-				font-family: courier;
+				font-family: Courier New;
 			}
 			.default
 			{

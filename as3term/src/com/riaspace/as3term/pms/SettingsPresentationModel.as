@@ -7,22 +7,19 @@ package com.riaspace.as3term.pms
 	import flash.filesystem.File;
 	import flash.system.Capabilities;
 	
+	import mx.validators.Validator;
+	
 	import org.swizframework.storage.SharedObjectBean;
 
 	public class SettingsPresentationModel
 	{
 		
 		[Bindable]
-		public var selectedFlexHome:String;
+		public var selectedFlexSdkDirPath:String;
 		
 		[Bindable]
 		public var selectedJavaPath:String;
 		
-		private var selectedMxmlc:File;
-		
-		[Bindable]
-		public var currentState:String;
-
 		[Inject]
 		public var applicationModel:ApplicationModel;
 
@@ -32,68 +29,49 @@ package com.riaspace.as3term.pms
 		[PostConstruct]
 		public function init():void
 		{
-			selectedJavaPath = applicationModel.java.nativePath;
-			if (selectedJavaPath)
-				resolveJava(new File(selectedJavaPath));
-			else
-				resolveJava(File.desktopDirectory);
+			if (applicationModel.javaExecutable)
+				selectedJavaPath = applicationModel.javaExecutable.nativePath;
 			
-			selectedFlexHome = applicationModel.flexHome;
-			if (selectedFlexHome)
-				resolveMxmlc(new File(selectedFlexHome));
-			else
-				resolveMxmlc(File.desktopDirectory);
+			if (applicationModel.flexSdkDir)
+				selectedFlexSdkDirPath = applicationModel.flexSdkDir.nativePath;
 		}
 
-		protected function resolveJava(javaPathRef:File):void
-		{
-			if (javaPathRef.exists)
-			{
-				selectedJavaPath = javaPathRef.nativePath;
-			}
-		}
-		
-		protected function resolveMxmlc(flexHomeRef:File):void
-		{
-			var mxmlc:File;
-			
-			if (flexHomeRef.exists)
-				mxmlc = flexHomeRef.resolvePath("bin").resolvePath(
-					(Capabilities.os.toLowerCase().indexOf("win") > -1 ? "mxmlc.exe" : "mxmlc"));
-			
-			if (mxmlc && mxmlc.exists)
-			{
-				currentState = "valid";
-				selectedFlexHome = flexHomeRef.nativePath;
-				selectedMxmlc = mxmlc;
-			}
-			else
-			{
-				currentState = "notvalid";
-			}
-		}
-		
 		public function btnSelectJavaPath_clickHandler(event:MouseEvent):void
 		{
 			var javaPathRef:File = new File(selectedJavaPath);
-			javaPathRef.addEventListener(Event.SELECT, function(event:Event):void {resolveJava(event.target as File);});
-			javaPathRef.browseForOpen("Select java executable...");			
+			javaPathRef.addEventListener(Event.SELECT, 
+				function(event:Event):void 
+				{
+					selectedJavaPath = File(event.target).nativePath;
+				});
+			javaPathRef.browseForOpen("Select java executable file...");			
 		}
 		
 		public function btnSelectFlexHome_clickHandler(event:MouseEvent):void
 		{
-			var flexHomeRef:File = new File(selectedFlexHome);
-			flexHomeRef.addEventListener(Event.SELECT, function(event:Event):void {resolveMxmlc(event.target as File);});
-			flexHomeRef.browseForDirectory("Select bin folder of Flex SDK...");
+			var flexHomeRef:File = new File(selectedFlexSdkDirPath);
+			flexHomeRef.addEventListener(Event.SELECT, 
+				function(event:Event):void 
+				{
+					selectedFlexSdkDirPath = File(event.target).nativePath;
+				});
+			flexHomeRef.browseForDirectory("Select Flex SDK home folder...");
 		}
 		
-		public function btnSaveSettings_clickHandler(event:MouseEvent):void
+		public function btnSaveSettings_clickHandler(validators:Array):void
 		{
-			settings.setString("FLEX_HOME", selectedFlexHome); 
-			
-			applicationModel.flexHome = selectedFlexHome;
-			applicationModel.mxmlc = selectedMxmlc;
-			applicationModel.currentState = ApplicationModel.EDITOR_STATE;
+			if (Validator.validateAll(validators).length == 0)
+			{
+				applicationModel.flexSdkDir = new File(selectedFlexSdkDirPath);
+				applicationModel.javaExecutable = new File(selectedJavaPath);
+				
+				settings.setString("JAVA_EXECUTABLE_PATH", 
+					applicationModel.javaExecutable.nativePath);
+				settings.setString("FLEX_SDK_DIR_PATH",
+					applicationModel.flexSdkDir.nativePath);
+				
+				applicationModel.currentState = ApplicationModel.EDITOR_STATE;
+			}
 		}
 	}
 }

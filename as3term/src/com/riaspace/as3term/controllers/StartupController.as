@@ -29,6 +29,8 @@ package com.riaspace.as3term.controllers
 		[PostConstruct]
 		public function init():void
 		{
+//			settings.clear();
+			
 			initTemplate();
 			
 			initSettings();
@@ -64,48 +66,43 @@ package com.riaspace.as3term.controllers
 		
 		protected function initSettings():void 
 		{
-			var java:File;
-			var javaPath:String = settings.getString("JAVA_PATH");
+			var javaExecutable:File;
+			var javaExecutablePath:String = 
+				settings.getString("JAVA_EXECUTABLE_PATH");
 			
-			if (javaPath)
-				java = new File(javaPath);
+			if (javaExecutablePath)
+				javaExecutable = new File(javaExecutablePath);
 			
-			if (!java || !java.exists)
+			if (!javaExecutable || !javaExecutable.exists)
 			{
 				if (os.indexOf('win') > -1)
 				{
-					java = new File("c:/windows/system32/javaw.exe");
+					javaExecutable = new File("c:/windows/system32/javaw.exe");
 				}
 				else
 				{
-					java = new File("/usr/bin/java");
-					if (!java.exists)
-						java = new File(os.indexOf("mac") > -1 ? 
+					javaExecutable = new File("/usr/bin/java");
+					if (!javaExecutable.exists)
+						javaExecutable = new File(os.indexOf("mac") > -1 ? 
 							"/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands/java" 
 							: 
 							"/etc/alternatives/java");
 				}
 			}
 			
-			var mxmlc:File;
-			var flexHome:String = settings.getString("FLEX_HOME");
+			var flexSdkDir:File;
+			var flexSdkDirPath:String = settings.getString("FLEX_SDK_DIR_PATH");
 			
-			if (flexHome)
-				mxmlc = new File(flexHome)
-					.resolvePath("bin")
-					.resolvePath((os.indexOf("win") > -1 ? "mxmlc.exe" : "mxmlc"));
+			if (flexSdkDirPath)
+				flexSdkDir = new File(flexSdkDirPath);
 			
-			if (mxmlc && mxmlc.exists && java.exists)
-			{
-				applicationModel.java = java;
-				applicationModel.flexHome = flexHome;
-				applicationModel.mxmlc = mxmlc;
+			applicationModel.javaExecutable = javaExecutable;
+			applicationModel.flexSdkDir = flexSdkDir;
+			
+			if (flexSdkDir && flexSdkDir.exists && javaExecutable && javaExecutable.exists)
 				applicationModel.currentState = ApplicationModel.EDITOR_STATE;
-			}
 			else
-			{
 				applicationModel.currentState = ApplicationModel.SETTINGS_STATE;
-			}
 		}
 	}
 }

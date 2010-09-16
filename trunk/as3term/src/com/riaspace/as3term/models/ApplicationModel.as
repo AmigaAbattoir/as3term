@@ -14,11 +14,9 @@ package com.riaspace.as3term.models
 		
 		public var currentState:String;
 		
-		public var java:File;
+		public var javaExecutable:File;
 		
-		public var flexHome:String;
-		
-		public var mxmlc:File;
+		public var flexSdkDir:File;
 		
 		public var scriptTemplate:String;
 		

@@ -3,7 +3,7 @@
 					  xmlns:s="library://ns.adobe.com/flex/spark" 
 					  xmlns:mx="library://ns.adobe.com/flex/mx" width="400" height="300"
 					  backgroundColor="#2F2E2E" backgroundAlpha="0.9"
-					  currentState="{model.currentState}">
+					  xmlns:validators="com.riaspace.as3term.views.validators.*">
 
 	<fx:Script>
 		<![CDATA[
@@ -16,32 +16,33 @@
 		]]>
 	</fx:Script>
 	
-	<s:states>
-		<s:State name="notvalid" />
-		<s:State name="valid" />
-	</s:states>
-	
 	<fx:Declarations>
-		<!-- Place non-visual elements (e.g., services, value objects) here -->
+		<validators:PathValidator id="javaPathValidator" source="{txtJavaPath}" 
+								  property="text" 
+								  pathNotFoundError="Select valid path to Java executable!" />
+		<validators:PathValidator id="flexPathValidator" source="{txtSdkPath}" 
+								  property="text"
+								  isDirectory="true"
+								  directoryShouldContain="lib/fcsh.jar"
+								  pathNotFoundError="Select valid path to Flex SDK home directory!" />
+
 	</fx:Declarations>
 	
 	<s:Label text="Setup" fontSize="16" fontWeight="bold" top="30" left="30" />
 	
-	<mx:Form horizontalCenter="0" verticalCenter="0">
+	<mx:Form id="frm" horizontalCenter="0" verticalCenter="0">
 		<mx:FormItem label="Java executable:" direction="horizontal">
-			<s:TextInput id="txtJavaPath" text="{model.selectedJavaPath}" editable="false" width="180" 
-						 errorString.valid="{''}" errorString.notvalid="Select path that points to java executable."/>
+			<s:TextInput id="txtJavaPath" text="{model.selectedJavaPath}" editable="false" width="180" />
 			<s:Button id="btnSelectJavaPath" label="Select" click="model.btnSelectJavaPath_clickHandler(event)" />
 		</mx:FormItem>
 
-		<mx:FormItem label="FLEX_HOME folder:" direction="horizontal">
-			<s:TextInput id="txtSdkPath" text="{model.selectedFlexHome}" editable="false" width="180" 
-						 errorString.valid="{''}" errorString.notvalid="Select path that points to Flex SDK home folder."/>
+		<mx:FormItem label="Flex SDK folder:" direction="horizontal">
+			<s:TextInput id="txtSdkPath" text="{model.selectedFlexSdkDirPath}" editable="false" width="180" />
 			<s:Button id="btnSelectFlexHome" label="Select" click="model.btnSelectFlexHome_clickHandler(event)" />
 		</mx:FormItem>
 	</mx:Form>
 	
-	<s:Button id="btnSaveSettings" label="OK" click="model.btnSaveSettings_clickHandler(event)"
-			  bottom="10" right="10" enabled.valid="true" enabled.notvalid="false" />
+	<s:Button id="btnSaveSettings" label="OK" click="model.btnSaveSettings_clickHandler([javaPathValidator, flexPathValidator])"
+			  bottom="10" right="10" />
 
 </s:SkinnableContainer>
